@@ -3,12 +3,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-//#define DEBUG_TASK1 1
-
-#ifdef DEBUG_TASK1
-	char deb[100];
-#endif
-
 #define LEN 3
 #define INPUT_LEN 100
 
@@ -46,30 +40,20 @@ bool is_row_correct(char cl_bracket);
 
 int main(int argc, char* argv[]) {
 	
-	char input[101];
+	char input[100000];
 	int input_len = 0;
 	int input_char_num = 0;
 	
-	#ifdef DEBUG_TASK1
-		printf("Please enter a sequence of brackets (e.g. ([]{}) \r\n");
-	#endif
-	
 	gets(input);
 	input_len = strlen(input);
-	
-	#ifdef DEBUG_TASK1
-		sprintf(deb,"IN: '%s'. Size : %d\n\n",input, strlen(input));
-		printf("%s",deb);
-	#endif
+
 	
 	for(int k = 0; k < input_len; k++)
 	{
 		input_char_num++; // var to know the index of improper symbol
 		bool is_bracket = is_it_bracket(input[k]);
 		if (is_bracket) {
-			#ifdef DEBUG_TASK1
-			//	printf("It is bracket!\n");
-			#endif
+
 			if(is_it_open_bracket(input[k])) {
 				push(input[k]);	
 				if(stack_idx == 1 && stack[0] != 0)
@@ -85,9 +69,6 @@ int main(int argc, char* argv[]) {
 				}
 				else {
 					//need to find out index of first open bracket
-					#ifdef DEBUG_TASK1
-						printf("Exiting program...");
-					#endif
 					ret_fail(input_char_num);
 				}
 			}
@@ -100,10 +81,7 @@ int main(int argc, char* argv[]) {
 	if ( is_stack_empty() ) {
 	 	ret_success();
 	}
-	
-	#ifdef DEBUG_TASK1
-		printf("Cycle ended. Stack is not empty. No close bracket \n");
-	#endif
+
 	
 	/* Type of error - there is open bracket and no close bracket */
 	ret_fail(idx_first);
@@ -187,14 +165,9 @@ bool is_row_correct(char cl_bracket)
 	
 	//check previous item in the stack
 	if ( stack[stack_idx-1] == open_brackets[idx]) {
-		#ifdef DEBUG_TASK1
-			printf("Brackets were closed \n");
-		#endif
 		return true;
 	}
-	#ifdef DEBUG_TASK1
-		printf("Brackets were improperly closed \n");
-	#endif
+
 	return false;
 }
 
