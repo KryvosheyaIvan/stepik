@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define DEBUG
+//#define DEBUG
+
+#define STEP_LEN 100000
 
 typedef struct 
 {
@@ -16,11 +18,11 @@ typedef struct
 	int front;
 	int size;
 	int items_in;
-	Buffer* stepik_buffer;
+	Buffer stepik_buffer[STEP_LEN];
 } Queue;
 
 //global vars
-int* ret_data; //time when PC started to process every of num_packets
+int ret_data[STEP_LEN]; //time when PC started to process every of num_packets
 int timeflow = 0;
 
 
@@ -34,7 +36,7 @@ int main(void)
 {
 	int size;
 	int num_packets;
-	Buffer* incoming_buffer;
+	Buffer incoming_buffer[STEP_LEN];
 	
 	Queue queue = {
 		.front = -1,
@@ -48,14 +50,11 @@ int main(void)
 	
 	scanf("%d",&size);
 	scanf("%d",&num_packets);
-	
-	/* Allocate memory for buffer */
+
 	if( size > 0) {
-		queue.stepik_buffer = malloc(sizeof(Buffer)*size);
 		queue.size = size;
-		incoming_buffer = malloc(sizeof(Buffer)*num_packets);
-		ret_data = malloc(sizeof(int)*num_packets);
 	}
+	else return;
 	
 	#ifdef DEBUG
 		printf("\n Enter arrival time and duration to process it for each packet! \n");
@@ -70,60 +69,103 @@ int main(void)
 	if ( num_packets <= 0) return;
 	
 	/* Algorithm itself */
+	int ax_arrival, ax_duration;
 	for( int i = 0; i < num_packets; i++)
 	{
-		/*
-		if( !is_full(&queue) && timeflow )
-		{
-			enqueue(&queue, incoming_buffer+i);
-			
-			// if timeflow > time of arrival, return timeflow. Return time when packet is started to be processed 
-			ret_data[i] = ( timeflow > (incoming_buffer+i)->arrival) ? timeflow : (incoming_buffer+i)->arrival;
-			timeflow = ret_data[i] + (incoming_buffer+i)->duration;
+		#ifdef DEBUG
+			printf("\n [%d]", i);
+		#endif
 
-		}
-		// if we process packet in time until another comes - dequeue it and enqueue new		
-		else {
-			int ax_arrival, ax_duration;
-			peek(&queue, &ax_arrival, &ax_duration);
-		}
-		*/
 		if ( is_empty(&queue) )
 		{
-			enqueue(&queue, incoming_buffer+i);
+			#ifdef DEBUG
+			printf("\n empty!");
+			#endif
+			enqueue(&queue, &incoming_buffer[i]);
 			queue.front = 0;
+			
+			//calc time
+			peek(&queue, &ax_arrival, &ax_duration);
+			timeflow = ax_arrival;
+			
+			ret_data[i] = (incoming_buffer[i].arrival > timeflow) ? incoming_buffer[i].arrival : timeflow;
+			timeflow = ret_data[i] + incoming_buffer[i].duration;
 			continue;
 		}
 		
-		int ax_arrival, ax_duration;
+		
 		peek(&queue, &ax_arrival, &ax_duration);
 		int handle_time = (ax_arrival < timeflow) ? ax_arrival : timeflow;
 		handle_time = handle_time + ax_duration;
 		
-		/* If we have new packet before we handle front packet - then put it into queue */
+		// If we have new packet before we handle front packet - then put it into queue 
 		if( (incoming_buffer+i)->arrival < handle_time )
 		{
+			#ifdef DEBUG
+			printf("\n Got first!");
+			#endif
 			if ( is_full(&queue)) {
 			//for the moment of time, queue is full. Thats why we lose packet!
 			 ret_data[i] = -1;	
 			 continue;
 			}
 			//add packet!
-			enqueue(&queue, incoming_buffer+i);
+			enqueue(&queue, &incoming_buffer[i]);
+			ret_data[i] = (incoming_buffer[i].arrival > timeflow) ? incoming_buffer[i].arrival : timeflow;
+			timeflow = ret_data[i] + incoming_buffer[i].duration;
 		}
 		else { //we manage to handle packet at first!
+			#ifdef DEBUG
+			printf("\n Managed first!");
+			#endif
 			
 			//calculate current time!
 			peek(&queue, &ax_arrival, &ax_duration);
+			
+			if ( is_full(&queue)) {
+			//for the moment of time, queue is full. Thats why we lose packet!
+			 ret_data[i] = -1;	
+			}
+			
+			#ifdef DEBUG
+			printf("\n arr: %d, time: %d", ax_arrival, timeflow);
+			#endif
+			
 			ret_data[i] = (ax_arrival > timeflow) ? ax_arrival : timeflow;
 			timeflow = ret_data[i] ;
 			timeflow +=  ax_duration;
 			//remove element from queue
 			dequeue(&queue);
-			i--;
+			--i;
 		}
 		
+		#ifdef DEBUG
+			printf("\n time: %d \n", timeflow);
+		#endif
+		
 	}
+	
+	
+	
+	/* test
+	enqueue(&queue, &incoming_buffer[1]);
+	enqueue(&queue, &incoming_buffer[1]);
+	dequeue(&queue);
+	dequeue(&queue);
+	*/
+	
+	
+	//set ret buffer until queue is empty
+	/*while( !is_empty(&queue) ) {
+		
+		peek(&queue, &ax_arrival, &ax_duration);
+		ret_data[queue.front] = timeflow;
+		timeflow += ax_duration;
+		
+		dequeue(&queue);
+	}
+	*/
+	
 	
 	#ifdef DEBUG
 		printf("\n Return data! \n");
@@ -131,12 +173,13 @@ int main(void)
 		{
 			printf("[%d] %d \n", i, ret_data[i]);
 		}
+	#else
+		for( int i = 0; i < num_packets; i++)
+		{
+			printf("%d\n", ret_data[i]);
+		}
 	#endif
 	
-	//deallocating data
-	if( queue.stepik_buffer != NULL )   free(queue.stepik_buffer);
-	if( ret_data != NULL )				free(ret_data);
-	if( incoming_buffer != NULL )		free(incoming_buffer);
 		
 	return 0;
 }
@@ -169,10 +212,20 @@ void enqueue(Queue* queue, Buffer* buffer)
 		return;
 	}
 	
+	if( is_empty(queue)) {
+		queue->items_in = 0;
+		queue->rear = -1;
+	}
+	
 	queue->rear++;
 	queue->items_in++;
 	queue->stepik_buffer[queue->rear].arrival = buffer->arrival;
 	queue->stepik_buffer[queue->rear].duration = buffer->duration;
+	
+	#ifdef DEBUG
+		//printf("\n enqueue! front : %d, items: %d, rear: %d\n", queue->front, queue->items_in, queue->rear);
+	#endif
+	
 }
 
 /* remove an item from the queue */
@@ -183,16 +236,30 @@ void dequeue(Queue* queue)
 	if ( !is_empty(queue)) {
 		queue->front++;
 	}
-	else {
+	else if (is_empty(queue)) {
 		queue->front = -1;
+		queue->rear = -1;
+		queue->items_in = 0;
 	}
+	
+	#ifdef DEBUG
+		//printf("\n dequeue! front : %d, items: %d, rear: %d\n", queue->front, queue->items_in, queue->rear);
+	#endif
 }
 
 /* get front element, without removing it! */
 void peek(Queue* queue, int* arr, int* dur)
 {
-	*arr = queue->stepik_buffer[queue->front].arrival;
-	*dur = queue->stepik_buffer[queue->front].duration;
+	arr[0] = queue->stepik_buffer[queue->front].arrival;
+	dur[0] = queue->stepik_buffer[queue->front].duration;
+	
+	#ifdef DEBUG
+		printf("\n arr:%d, front: %d \n", queue->stepik_buffer[queue->front].arrival, queue->front);
+	
+		if ( is_empty(queue)) 
+				printf("\n FUCK!! \n");
+	
+	#endif
 }
 				 
 				 
