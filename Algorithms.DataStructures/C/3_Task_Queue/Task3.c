@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define DEBUG
+//#define DEBUG
 
 #define STEP_LEN ((long int)100000)
 
@@ -132,7 +132,7 @@ bool is_empty(Queue* queue)
 
 bool is_full(Queue* queue)
 {
-	if((queue->front== 0 && queue->rear == queue->size-1)|| ( queue->front == queue->rear+1) )
+	if ( ((queue->front== 0 && queue->rear == queue->size-1)) || ( queue->front == queue->rear+1) )
 	{
 		return true;
 	}
@@ -144,6 +144,9 @@ bool is_full(Queue* queue)
 void enqueue(Queue* queue, Buffer* buffer, int idx)
 {
 	if( is_full(queue)) {
+		#ifdef DEBUG
+		printf("\n FULL!");
+		#endif
 		return;
 	}
 
@@ -158,17 +161,30 @@ void enqueue(Queue* queue, Buffer* buffer, int idx)
 	queue->stepik_buffer[queue->rear].arrival = buffer->arrival;
 	queue->stepik_buffer[queue->rear].duration = buffer->duration;
 	queue->stepik_buffer[queue->rear].index = idx; //save index from incoming buffer
+	#ifdef DEBUG
+	printf("\n enq idx^ %d, index: %d", idx, queue->stepik_buffer[queue->rear].index);
+	#endif
 }
 
 /* remove an item from the queue */
 void dequeue(Queue* queue)
 {
 	if (is_empty(queue)) {
+		#ifdef DEBUG
+		printf("\n empty!");
+		#endif
 		queue->items_in = 0;
 		return;
 	}
 	
-	if ( queue->front == queue->size-1) queue->front = 0;
+	if ( queue->front == queue->size-1) 
+	{
+		#ifdef DEBUG
+		printf("\n front==0!");
+		#endif
+		//oold queue->front = 0;
+		queue->front = -1;
+	}
 	else if( queue->front == queue->rear)
 	{
 		queue->front = -1;
@@ -208,6 +224,16 @@ void watch_time(int action, int i, Queue* queue)
 		/* if last packet arrives after previous has been processed */
 		if( incoming_buffer[i].arrival >= finish_time[ret_index_from_cQueue(queue)] )
 		{			
+			
+			#ifdef DEBUG
+			printf("\n [%d] arr %d >= fin  %d \n %d", i, incoming_buffer[i].arrival, finish_time[ret_index_from_cQueue(queue)], ret_index_from_cQueue(queue));
+			
+			if ( ret_index_from_cQueue(queue)==2)
+			{
+				printf("\n dur %d", queue->front);
+			}
+			#endif
+			
 			//free 1 space
 			dequeue(queue);
 			
@@ -216,6 +242,9 @@ void watch_time(int action, int i, Queue* queue)
 			ret_time[i] = (incoming_buffer[i].arrival > finish_time[i-1]) ? incoming_buffer[i].arrival : finish_time[i-1];
 			finish_time[i] = ret_time[i] + incoming_buffer[i].duration;
 
+			#ifdef DEBUG
+			
+			#endif
 			enqueue(queue, &incoming_buffer[i], i);
 			
 		}
