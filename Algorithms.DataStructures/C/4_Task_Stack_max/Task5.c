@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-
 //#define DEBUG
 
 int num_queries;
@@ -23,7 +22,7 @@ bool is_stack_empty();
 /* Function returns true is it is push operation
 	and then sets global variable curr_push
 */
-bool is_push_input(char* input, int* num_to_push);
+bool is_push_input(char* input);
 
 /* Function returns true if it is "max" input
 	else - false
@@ -33,10 +32,14 @@ bool is_max_input(char* input);
 /* Get max value on the stack */
 int get_max_on_stack(void);
 
+	char input_2D[400000][64];
+
 int main(int argc, char* argv[]) {
 	
 	char input[64];
 	bool is_push = false, is_max = false;
+	
+
 	
 	#ifdef DEBUG
 		printf("\n Enter number of queries...\n");
@@ -46,21 +49,30 @@ int main(int argc, char* argv[]) {
 	fgets(input, sizeof(input), stdin);
 	sscanf(input,"%d", &num_queries);
 	
+	#ifdef DEBUG
+		printf("\n queries : %d \n", num_queries);
+	#endif
+	
 	if( num_queries <= 0) return 0;
 	
 	for ( int i = 0; i < num_queries; i++)
 	{
-		#ifdef DEBUG
-			printf("\n Enter operation and value (ex pop or push 34) or max \n");
-		#endif
-		fgets(input, 64, stdin); //sizeof(input)
+		//scanf("%s%d",&input_2D[i][0], &input_num[i]);
+		fgets(&input_2D[i][0], 64, stdin); //sizeof(input)
+		//#ifdef DEBUG
+		//printf("\n [%d] %s %d \n",i, input_2D[i], input[i]);
+		//#endif
 		
-		is_max = is_max_input(input);
+	}
+	
+	for ( int i = 0; i < num_queries; i++)
+	{
+		is_max = is_max_input(&input_2D[i][0]);
 		
 		if ( !is_max) {
-			is_push = is_push_input(input, &curr_val_to_push);
+			is_push = is_push_input(&input_2D[i][0]);
 			
-			if ( is_push ) {			
+			if ( is_push ) {	
 				// if stack is empty, set max value
 				if( is_stack_empty() ) max_element = curr_val_to_push;
 				
@@ -112,8 +124,8 @@ int main(int argc, char* argv[]) {
 	printf("%s\n\n\n", ret_str);
 	#endif
 	
-	fwrite(ret_str, 1, strlen(ret_str), stdout);
-	//printf("%s", ret_str);
+	//fwrite(ret_str, 1, strlen(ret_str), stdout);
+	printf("%s", ret_str);
 	//puts(ret_str);
 
 	return 0;
@@ -122,7 +134,7 @@ int main(int argc, char* argv[]) {
 /* Function returns true if it is push operation
 	and then sets global variable curr_push
 */
-bool is_push_input(char* input, int* num_to_push)
+bool is_push_input(char* input)
 {
 	char operation_type[64]; //pop or push
 	bool POP = false, PUSH = true;
@@ -148,6 +160,10 @@ bool is_push_input(char* input, int* num_to_push)
 	*/
 bool is_max_input(char* input)
 {
+	#ifdef DEBUG
+		printf("\n is_max: %s \n", input);
+	#endif
+	
 	if( memcmp(input, "max", 3) == 0) return true;
 	
 	return false;
