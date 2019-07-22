@@ -1,7 +1,6 @@
 import sys
 import re				# regular expressions library
 
-print('Hello!')
 
 pyStack = [] 			# Stack instructions (pop, push, max...)
 #pyStackNumb = [] 		# Stack numbers 0, 100, -2
@@ -13,7 +12,7 @@ retString=str() 		# resulted line (output)
 curr_val_to_push=-1		# current value to push
 max_element=-1			# current maximum value in the stack
 
-DEBUG=1
+DEBUG=0
 
 ''' 
 Function returns true if there is "max" in tempStr
@@ -29,9 +28,10 @@ def is_max_input(tempStr):
 ''' 
 Function returns true if pyStack is empty
 '''
-def is_stack_empty(stack_top_loc):
-	if (stack_top_loc <= -1):
-		stack_top_loc = -1
+def is_stack_empty():
+	global stack_top
+	if (stack_top <= -1):
+		stack_top = -1
 		return True
 	return False
 	
@@ -39,54 +39,64 @@ def is_stack_empty(stack_top_loc):
 	Function returns true if it is push operation
 	and then sets global variable curr_push
 '''
-def is_push_input(tempInput,curr_val_to_push):
+def is_push_input(tempInput):
 	POP = False
 	PUSH = True
 	pop_s = "pop"
 	push_s = "push"
 	
+	global curr_val_to_push
+	
 	if pop_s in tempInput:
 		return POP
 	elif push_s in tempInput:
 		curr_val_to_push = int(re.search(r'\d+', tempInput).group())	#use regular expression lib to find an integer
-		#print('re: ', curr_val_to_push) 
 		return PUSH
 
 '''
 	Function pushes an element ont the stack
 '''		
-def push(element, stack_top_pointer): 
-	stack_top_pointer +=1
-	pyStackNumb[stack_top_pointer]=element
-	print('local',pyStackNumb)
+def push(element): 
+	global stack_top
+	global pyStackNumb
+	
+	stack_top +=1
+	pyStackNumb[stack_top]=element
 	return
 
 '''
 	Remove top element from the stack
 '''
-def pop(stack_top_local) :
-	bIsStackEmpty = is_stack_empty(stack_top_local)
+def pop():
+	global stack_top
+	global pyStackNumb
+	
+	bIsStackEmpty = is_stack_empty()
 	
 	#if stack is empty, there is no element to remove
-	if bIsStackEmpty:
+	if (bIsStackEmpty == True):
 		return
 	
-	pyStackNumb[stack_top_local] = 0
-	stack_top_local -= 1
+	pyStackNumb[stack_top] = 0
+	stack_top -= 1
+	return
 
 '''
  Get max value on the stack
 '''
-def get_max_on_stack(stack_top_local):
+def get_max_on_stack():
+	global stack_top
+	global pyStackNumb
+	
 	max_element=0	#declare variable
-	if ( stack_top_local == 0):
+	if ( stack_top == 0):
 		max_element = pyStackNumb[0];
 		return max_element
 
-	max_element = stack[0]
+	max_element = pyStackNumb[0]
 	
 	##derive max element in the stack
-	for idx in range(stack_top_local+1):
+	for idx in range(stack_top+1):
 		if (pyStackNumb[idx] > max_element):
 			max_element = pyStackNumb[idx]
 	
@@ -111,7 +121,9 @@ if num_queries <= 0:
 	print('Error 1')
 	exit(0)
 	
-pyStackNumb = [num_queries] 		# Stack numbers 0, 100, -2
+pyStackNumb = [0 for c in range(num_queries)] 		# Stack numbers 0, 100, -2
+
+#print('len ' , len(pyStackNumb))
 	
 
 pyString=str()	#init empty string
@@ -143,44 +155,40 @@ for queryIdx in range(num_queries):
 	bIsMax = is_max_input(pyStack[queryIdx]) # is there a max instruction?
 	
 	if bIsMax != True :
-		bIsPush = is_push_input(pyStack[queryIdx],curr_val_to_push)
+		bIsPush = is_push_input(pyStack[queryIdx]) #get curr_val_to_push also!
 		if (bIsPush == True) :	#PUSH OPERATION
-			print('PUSH!')
+			#print('PUSH!')
 			# if stack is empty, set max value
-			bIsStackEmpty = is_stack_empty(stack_top) 
+			bIsStackEmpty = is_stack_empty() 
 			if (bIsStackEmpty == True):
 				max_element = curr_val_to_push
 			
-			push(curr_val_to_push,stack_top)
-			print('global',pyStackNumb)
+			push(curr_val_to_push)
 			
 			#if current element > max_element then reset max value
 			if (curr_val_to_push > max_element):
 				max_element = curr_val_to_push
 		#POP OPERATION
 		else:
-			bIsStackEmpty = is_stack_empty(stack_top)
+			bIsStackEmpty = is_stack_empty()
 			if ( bIsStackEmpty != True):
-				if (pyStackNumb[stack_top] > max_element):
-					pop(stack_top)
+				if (pyStackNumb[stack_top] >= max_element):
+					pop()
 					
 					##reevaluate maximum element on the stack
-					bIsStackEmpty = is_stack_empty(stack_top)
-					if (bIsStackEmpty != False):
-						max_element = get_max_on_stack(stack_top);
+					bIsStackEmpty = is_stack_empty()
+					if (bIsStackEmpty != True):
+						max_element = get_max_on_stack();
 			else:
-				pop(stack_top) #just pop		
+				pop() #just pop		
 	else:
 		'''
 		actions if max was entered
 		if stack is not empty - show current max value on the stack
 		'''
-		print('MAXMUM')
-		bIsStackEmpty = is_stack_empty(stack_top) 
+		bIsStackEmpty = is_stack_empty() 
 		if (bIsStackEmpty != True): #if stack is not empty
 			#append output string
-			if (DEBUG==1):
-				print('HERE!')
 			retString += str(max_element)
 			retString += '\n'
 
