@@ -13,6 +13,7 @@ curr_val_to_push=-1		# current value to push
 max_element=-1			# current maximum value in the stack
 
 DEBUG=0
+TEST=0
 
 ''' 
 Function returns true if there is "max" in tempStr
@@ -179,8 +180,8 @@ for queryIdx in range(num_queries):
 					bIsStackEmpty = is_stack_empty()
 					if (bIsStackEmpty != True):
 						max_element = get_max_on_stack();
-			else:
-				pop() #just pop		
+				else:
+					pop() #just pop		
 	else:
 		'''
 		actions if max was entered
@@ -196,6 +197,11 @@ for queryIdx in range(num_queries):
 if DEBUG==1:
 	print('Result: ', retString)
 else:
+	#retString = retString[:-1] #remove last character (new line)
+	if TEST:
+		retString = retString.replace('\n',';')
 	print(retString)
+	
+exit(0)
 	
 
