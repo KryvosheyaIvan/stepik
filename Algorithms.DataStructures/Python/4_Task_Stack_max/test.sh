@@ -9,6 +9,13 @@ Green='\033[0;32m'
 Red='\033[0;31m'
 testNum=0			# test automatic number
 
+
+
+
+test_res=$(python3 Task4_p3.py <<< $'1 \n push 2 \n max')
+printf "\n ${Red} Output: ${test_res} \n"
+exit 0
+
 ################# TEST 1 #################
 let "testNum++"							
 correct_res="2;2;"
@@ -36,6 +43,7 @@ else
 	printf "\n ${Green} Correct: ${correct_res}"
 	printf "\n ${Red} Output: ${test_res} \n"
 fi
+
 
 ################# TEST 3 #################
 let "testNum++"

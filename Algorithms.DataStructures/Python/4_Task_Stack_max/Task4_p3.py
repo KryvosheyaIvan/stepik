@@ -13,7 +13,7 @@ curr_val_to_push=-1		# current value to push
 max_element=-1			# current maximum value in the stack
 
 DEBUG=0
-TEST=0
+TEST=1
 
 ''' 
 Function returns true if there is "max" in tempStr
@@ -89,7 +89,7 @@ def get_max_on_stack():
 	global stack_top
 	global pyStackNumb
 	
-	max_element=0	#declare variable
+	max_element=0	#declare local variable
 	if ( stack_top == 0):
 		max_element = pyStackNumb[0];
 		return max_element
@@ -130,25 +130,36 @@ pyStackNumb = [0 for c in range(num_queries)] 		# Stack numbers 0, 100, -2
 pyString=str()	#init empty string
 
 ##Get all commands from keyboard
-for numQue in range(num_queries):
-	tempStr=input()
-	pyString += tempStr
-	pyString += '\n'			# add empty line
+#for numQue in range(num_queries):
+#	tempStr=input()
+#	pyString += tempStr
+#	pyString += '\n'			# add empty line
+
+#pyStack = list(int(i) for i in input().split())
+#pyStack = tuple(map(str, line.split()) for line in sys.stdin)
+#pyStack = sys.stdin.readlines()
+pyString = sys.stdin.readlines()
+print(pyString)
+exit(0)
 
 # DEBUG
 #print(pyString)
 #print(pyString.splitlines())
 
 ## Split inut. Assign command to every next index
-pyStack = pyString.splitlines()
+#pyStack = pyString.splitlines()
+
+pyStack = pyString
 
 #Print prev operation result
-'''
+
 if DEBUG:
-	lengthStack = len(pyStack)
-	for index in range(lengthStack):
-		print(pyStack[index])	
-'''
+	lengthStack = len(pyString)
+	for index in range(num_queries):
+		print(pyString[index])
+		print('ska')	
+
+exit(0)
 
 ## Going through the whole range of instructions
 for queryIdx in range(num_queries):

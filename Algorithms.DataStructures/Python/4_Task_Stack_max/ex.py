@@ -1,20 +1,24 @@
-'''
-def chSka(m):
-	m[0] = 'cunt'
-	return
 
-x = 'ska'
-chSka(x)
+import sys
 
-print(x)
-'''
+pyStack = [] 
 
-list_ska = [3]
-list_ska[0]= '-1'
 
-def foo():
-	global list_ska
-	list_ska[0]=-2
-	
-foo()
-print(list_ska)
+data = sys.stdin.readlines()
+print("Counted", len(data), "lines.")
+print(data)
+exit(0)
+
+
+
+#pyStack = map(int, line.split()) for line in sys.stdin)
+
+#pyStack = tuple(map(str, line.split()) for line in sys.stdin)
+
+for line in sys.stdin:
+	pyStack[i] = line
+	if "end" in line:
+		print('fuck')
+		break
+
+print(pyStack)
