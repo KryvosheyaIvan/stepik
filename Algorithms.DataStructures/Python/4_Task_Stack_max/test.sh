@@ -1,8 +1,7 @@
 #!/sh/bin
 
-#echo "Test 1"
-#python3 Task4_p3.py <<< $'5\npush 2\npush 1\nmax\npop\nmax'
-#echo "correct 2 2"
+## Time limit 47 
+##
 
 #Color definitions
 Green='\033[0;32m'
@@ -10,11 +9,11 @@ Red='\033[0;31m'
 testNum=0			# test automatic number
 
 
+echo "Please enable test in Task4_p3.py !"
 
-
-test_res=$(python3 Task4_p3.py <<< $'1 \n push 2 \n max')
-printf "\n ${Red} Output: ${test_res} \n"
-exit 0
+#test_res=$(python3 Task4_p3.py <<< $'1 \n push 2 \n max')
+#printf "\n ${Red} Output: ${test_res} \n"
+#exit 0
 
 ################# TEST 1 #################
 let "testNum++"							

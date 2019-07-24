@@ -1,8 +1,6 @@
 import sys
 import re				# regular expressions library
 
-
-pyStack = [] 			# Stack instructions (pop, push, max...)
 #pyStackNumb = [] 		# Stack numbers 0, 100, -2
 
 stack_top=-1 			# points to the top of the Stack
@@ -135,39 +133,26 @@ pyString=str()	#init empty string
 #	pyString += tempStr
 #	pyString += '\n'			# add empty line
 
-#pyStack = list(int(i) for i in input().split())
-#pyStack = tuple(map(str, line.split()) for line in sys.stdin)
-#pyStack = sys.stdin.readlines()
+
 pyString = sys.stdin.readlines()
-print(pyString)
-exit(0)
-
-# DEBUG
-#print(pyString)
-#print(pyString.splitlines())
-
-## Split inut. Assign command to every next index
-#pyStack = pyString.splitlines()
-
-pyStack = pyString
 
 #Print prev operation result
-
+'''
 if DEBUG:
 	lengthStack = len(pyString)
 	for index in range(num_queries):
 		print(pyString[index])
 		print('ska')	
-
 exit(0)
+'''
 
 ## Going through the whole range of instructions
 for queryIdx in range(num_queries):
 	#print(queryIdx)
-	bIsMax = is_max_input(pyStack[queryIdx]) # is there a max instruction?
+	bIsMax = is_max_input(pyString[queryIdx]) # is there a max instruction?
 	
 	if bIsMax != True :
-		bIsPush = is_push_input(pyStack[queryIdx]) #get curr_val_to_push also!
+		bIsPush = is_push_input(pyString[queryIdx]) #get curr_val_to_push also!
 		if (bIsPush == True) :	#PUSH OPERATION
 			#print('PUSH!')
 			# if stack is empty, set max value
