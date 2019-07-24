@@ -1,2 +1,7 @@
-#Ignore all object files
-*.o
+# Ignore all files
+*
+
+# Let C, Python and bash files
+!*.c
+!*.py
+!*.sh
