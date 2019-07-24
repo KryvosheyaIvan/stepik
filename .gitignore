@@ -2,6 +2,7 @@
 *
 
 # Let C, Python and bash files
+!/**/
 !*.c
 !*.py
 !*.sh
