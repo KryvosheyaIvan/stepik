@@ -19,7 +19,7 @@ printf "\n ${Blue} Test ${pyScript}. \n"
 ################# TEST 1 #################
 let "testNum++"							
 correct_res="1 2 3 4 5 "
-test_res=$(python3  ${pyScript} TEST=1 <<< $'5\n 1 2 3 4 5 \n 1 ')
+test_res=$(python3  ${pyScript} TEST=1 DEBUG=0 <<< $'5\n 1 2 3 4 5 \n 1 ')
 
 if [ "$test_res" = "$correct_res" ]
 then

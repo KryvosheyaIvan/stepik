@@ -16,6 +16,7 @@ DEBUG=0
 DEBUG_LEVEL=0															#current debug level
 
 DEBUG_LEVEL_1=1
+DEBUG_LEVEL_2=2
 DEBUG_LEVEL_MAX=4
 
 # Operation speed
@@ -26,6 +27,11 @@ SPEED=LOW_SPEED
 
 ##Variables
 array_A = []															# incoming array
+
+array_B = []															# auxil array 1
+array_C = []															# auxil array 2
+array_MAX = []															# array to output
+																		# contains max element in every block
 
 arrLen=1																# array length
 windLen=1																# window length
@@ -116,10 +122,63 @@ def main():
 	
 	#define number of blocks
 	blocksNum = arrLen / (windLen - 1)
+	blocksNum = int(blocksNum)			# cast to integer
 	if (arrLen % (windLen - 1)):		# if blocksNum.23
 		blocksNum += 1 					# then blocksNum++
 	if DEBUG:
 		print('Number of blocks: ', blocksNum)
+		
+	#rescale lists
+	array_B   = [0 for i in range(blocksNum)]							#range(blocksNum)
+	array_C   = [0 for i in range(blocksNum)]							#range(blocksNum)
+	array_MAX = [0 for i in range(blocksNum)]							#range(blocksNum)
+	
+	if DEBUG:
+		if (DEBUG_LEVEL >= DEBUG_LEVEL_MAX):
+			print('Array_B len ', len(array_B))
+			print('Array_C len ', len(array_C))
+		
+	
+	temp_max_B = 0
+	temp_max_C = 0
+	#set array B and C
+	for i in range(blocksNum):
+		for k in range(windLen-1):
+			temp_max_B = 0
+			temp_max_C = 0
+			
+			#derive temp_max_B
+			for j in range(k+1): #include k
+				#result = (onFalse,onTrue)[test] #ternar operation
+				temp_max_B = (array_A[i*(windLen-1)+j],temp_max_B)[temp_max_B>array_A[i*(windLen-1)+j]] #ternar operation python style
+			array_B[i*(windLen-1)+k] = temp_max_B
+			
+			#derive temp_max_C
+			for j in range(k,windLen-1):
+				#result = (onFalse,onTrue)[test] #ternar operation 
+				temp_max_C = (array_A[i*(windLen-1)+j],temp_max_C)[temp_max_C>array_A[i*(windLen-1)+j]] #ternar operation python style
+			array_C[i*(windLen-1)+k] = temp_max_C
+			
+	## display intermediate results (array B and C)
+	if DEBUG:
+		if (DEBUG_LEVEL >= DEBUG_LEVEL_2):
+			print('Array_B ', array_B)
+			print('Array_C ', array_C)
+			
+			
+	## derive max element for every block
+	for idx in range(arrLen - windLen + 1):
+		array_MAX[idx] = (array_B[idx + windLen - 1],array_C[idx])[array_C[idx] > array_B[idx + windLen - 1]]
+		
+	if DEBUG:
+		if (DEBUG_LEVEL >= DEBUG_LEVEL_1):
+			print('Array_MAX ', array_MAX)
+	else:
+		for idx in range(arrLen - windLen + 1):
+			print(array_MAX[idx], end=' ')
+	
+	exit(0)
+				
 		
 	
 	
