@@ -14,10 +14,11 @@ then
 fi
 
 ################# TEST 1 #################
-correct_res="3 1 4 0 1 1 3 "
-test_res=$(./task6 <<< '5 5 4 3 2 1 ')
+correct_res="3_1<->4_0<->1_1<->3_"
+test_res=$(./task6 TEST=1 DEBUG=0<<< $'5\n5 4 3 2 1\n')
 
 if [ "$test_res" = "$correct_res" ]
+#if [ ${test_res} == ${orrect_res}]
 then
 	printf "\n ${Green} Test 1 passed \n"
 else

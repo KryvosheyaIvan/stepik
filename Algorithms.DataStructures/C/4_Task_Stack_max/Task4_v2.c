@@ -4,12 +4,19 @@
 #include <string.h>
 
 //#define DEBUG
+bool TEST = false;
+
+//
+int max_stack[100000];				// stack with max elements
+int max_top = -1;
+//
+
 
 int num_queries;
 
+/* Stack itself */
 int stack[100000];
 int stack_top = -1;					// stack pointer
-int max_element;					// max element on the stack
 
 int curr_val_to_push;				// next value to stack
 
@@ -29,18 +36,21 @@ bool is_push_input(char* input);
 	*/
 bool is_max_input(char* input);
 
-/* Get max value on the stack */
-int get_max_on_stack(void);
-
-	char input_2D[400000][64];
+/* 2d Array with commands */
+char input_2D[400000][64];
 
 int main(int argc, char* argv[]) {
 	
 	char input[64];
 	bool is_push = false, is_max = false;
 	
-
-	
+	/* ./objectFile TEST=1 to use test.sh */
+	/* Its to simplify automatic testing  */
+	if ( argc > 1 ) {
+		//deb printf("%s", argv[1]);
+		TEST=true;
+	}
+		
 	#ifdef DEBUG
 		printf("\n Enter number of queries...\n");
 	#endif
@@ -55,16 +65,13 @@ int main(int argc, char* argv[]) {
 	
 	if( num_queries <= 0) return 0;
 	
+	/* Get cmds (max,pop,push) */
 	for ( int i = 0; i < num_queries; i++)
 	{
-		//scanf("%s%d",&input_2D[i][0], &input_num[i]);
-		fgets(&input_2D[i][0], 64, stdin); //sizeof(input)
-		//#ifdef DEBUG
-		//printf("\n [%d] %s %d \n",i, input_2D[i], input[i]);
-		//#endif
-		
+		fgets(&input_2D[i][0], sizeof(input), stdin); 	
 	}
 	
+	/* Walk through cmds */
 	for ( int i = 0; i < num_queries; i++)
 	{
 		is_max = is_max_input(&input_2D[i][0]);
@@ -72,62 +79,32 @@ int main(int argc, char* argv[]) {
 		if ( !is_max) {
 			is_push = is_push_input(&input_2D[i][0]);
 			
-			if ( is_push ) {	
-				// if stack is empty, set max value
-				if( is_stack_empty() ) max_element = curr_val_to_push;
-				
+			if ( is_push ) {								//push
 				push(curr_val_to_push);
-				
-				//if current element > max_element then reset max value
-				if ( curr_val_to_push > max_element) max_element = curr_val_to_push;
 			}
-			else {			//pop operation
-				if( !is_stack_empty() ){
-					if ( stack[stack_top] >= max_element)
-					{
+			else if( !is_stack_empty() ){
 						pop();
-						if( !is_stack_empty() ) {
-							//reevaluate maximum element on the stack
-							max_element = get_max_on_stack();
-						}
-					}
-					else {
-						//just pop
-						pop();
-					}
-				}	
-			}
+			}	
+		
 			
 		}
 		else { //actions if max was entered
-			//if stack is not empty - show current max value on the stack
-			
+			//if stack is not empty - show current max value on the stack		
 		 	if( !is_stack_empty() ) {
-				//olf #55test failed// printf("%d\n", max_element);
 				char curr_max[60];
-				sprintf(curr_max,"%d\n",max_element);
-				strcat(ret_str,curr_max);
-				//append ret string
+				if(TEST) {
+					sprintf(curr_max,"%d;", max_stack[max_top]);
+					strcat(ret_str,curr_max); //append ret string
+				}
+				else {
+					sprintf(curr_max,"%d\n", max_stack[max_top]);
+					strcat(ret_str,curr_max); //append ret string
+				}			
 			}
 		}
-		
-	#ifdef DEBUG
-		if( !is_max)
-			printf("\n [%d] %s %d \n", i, (is_push ? "push" : "pop"), ( !is_push ? -1 : curr_val_to_push) );
-		else
-			printf("\n [%d] %s \n", i, "max");
-	#endif
-		
-	}
-
-	#ifdef DEBUG
-	printf("%s\n\n\n", ret_str);
-	#endif
+	}// ~for
 	
-	//fwrite(ret_str, 1, strlen(ret_str), stdout);
-	printf("%s", ret_str);
-	//puts(ret_str);
-
+	fwrite(ret_str, 1, strlen(ret_str), stdout);
 	return 0;
 }
 
@@ -149,7 +126,6 @@ bool is_push_input(char* input)
 	}
 	else if (memcmp(operation_type, push_s, 4) == 0) 
 	{
-		//old sscanf(input,"%s%d", operation_type, &curr_val_to_push);//num_to_push);
 		return PUSH;
 	}
 	return POP;	
@@ -172,42 +148,42 @@ bool is_max_input(char* input)
 
 void push(int a) 
 {
+	//stack
 	stack_top++;
 	stack[stack_top] = a;
+			
+	max_top++;
+	//max_stack
+	if ( max_top != 0) {
+		max_stack[max_top]= (a > max_stack[max_top-1]) ? a : max_stack[max_top-1];
+	}
+	else {
+		max_stack[max_top] = a;
+	}
 }
 
 void pop() 
 {
 	if ( is_stack_empty()) return;
+	//stack
 	stack[stack_top] = 0;
 	stack_top--;
+	
+	//max_stack
+	max_stack[max_top]=0;
+	max_top--;
 }
 
+/* Check if stack empty */
 bool is_stack_empty(void) 
 {
 
 	if ( stack_top <= -1 ) {
 		stack_top = -1;
+		max_top = - 1;
 		return true;
 	}
 
 	return false;
-}
-
-/* Get max value on the stack */
-int get_max_on_stack(void) 
-{
-	int max_element;
-	if ( stack_top == 0) {
-		max_element = stack[0];
-		return max_element;
-	}
-	max_element = stack[0];
-	
-	for ( int i = 0; i <= stack_top; i++)
-	{
-		if( stack[i] > max_element) max_element = stack[i];
-	}
-	return max_element;
 }
 
