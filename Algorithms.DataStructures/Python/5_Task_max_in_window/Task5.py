@@ -97,10 +97,12 @@ def main():
 		array_A = list(map(int, input().split()))
 	else:
 		print('Not implemented')
-		
+	
+	array_A.append(0)	
+	
 	if DEBUG:
 		if (DEBUG_LEVEL >= DEBUG_LEVEL_MAX):
-			print('Array ', array_A)
+			print('Array ', array_A,' size: ', len(array_A))
 			
 	##get 'window' size
 	if DEBUG:
@@ -127,11 +129,12 @@ def main():
 		blocksNum += 1 					# then blocksNum++
 	if DEBUG:
 		print('Number of blocks: ', blocksNum)
+		print('Size of the window: ', windLen)
 		
 	#rescale lists
-	array_B   = [0 for i in range(blocksNum)]							#range(blocksNum)
-	array_C   = [0 for i in range(blocksNum)]							#range(blocksNum)
-	array_MAX = [0 for i in range(blocksNum)]							#range(blocksNum)
+	array_B   = [0 for i in range(arrLen+1)]				#range(blocksNum)
+	array_C   = [0 for i in range(arrLen+1)]				#range(blocksNum)
+	array_MAX = [0 for i in range(arrLen+1)]				#range(blocksNum)
 	
 	if DEBUG:
 		if (DEBUG_LEVEL >= DEBUG_LEVEL_MAX):
@@ -150,13 +153,27 @@ def main():
 			#derive temp_max_B
 			for j in range(k+1): #include k
 				#result = (onFalse,onTrue)[test] #ternar operation
-				temp_max_B = (array_A[i*(windLen-1)+j],temp_max_B)[temp_max_B>array_A[i*(windLen-1)+j]] #ternar operation python style
+				#temp_max_B = (array_A[i*(windLen-1)+j],temp_max_B)[temp_max_B>array_A[i*(windLen-1)+j]] #ternar operation python style
+				if ( temp_max_B > array_A[i*(windLen-1)+j] ):
+					temp_max_B = temp_max_B
+				else:
+					temp_max_B = array_A[i*(windLen-1)+j]
+
 			array_B[i*(windLen-1)+k] = temp_max_B
+			
 			
 			#derive temp_max_C
 			for j in range(k,windLen-1):
 				#result = (onFalse,onTrue)[test] #ternar operation 
-				temp_max_C = (array_A[i*(windLen-1)+j],temp_max_C)[temp_max_C>array_A[i*(windLen-1)+j]] #ternar operation python style
+				#temp_max_C = (array_A[i*(windLen-1)+j],temp_max_C)[temp_max_C>array_A[i*(windLen-1)+j]] #ternar operation python style
+				#if DEBUG:
+				#	if (DEBUG_LEVEL >= DEBUG_LEVEL_MAX):
+				#		print('171 : ', i*(windLen-1)+j,' i= ', i, ' k=', k, ' j=', j )
+					
+				if ( temp_max_C > array_A[i*(windLen-1)+j] ):
+					temp_max_C = temp_max_C
+				else:
+					temp_max_C = array_A[i*(windLen-1)+j]
 			array_C[i*(windLen-1)+k] = temp_max_C
 			
 	## display intermediate results (array B and C)
@@ -173,6 +190,7 @@ def main():
 	if DEBUG:
 		if (DEBUG_LEVEL >= DEBUG_LEVEL_1):
 			print('Array_MAX ', array_MAX)
+	#elif TEST:
 	else:
 		for idx in range(arrLen - windLen + 1):
 			print(array_MAX[idx], end=' ')
